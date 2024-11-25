@@ -3,23 +3,26 @@ import { useAppStore } from "../../store";
 import { useNavigate } from "react-router-dom";
 import ContactsContainer from "./components/contacts-container";
 import EmptyChatContainer from "./components/empty-chat-container";
+import ChatContainer from "./components/chat-container";
 
 const Chat = () => {
-  const { userInfo } = useAppStore();
+  const { userInfo,updateKeys,selectedChatType } = useAppStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!userInfo.profileSetup) {
-      alert("Please set up profile to continue.");
+      // alert("Please set up profile to continue.");
+      updateKeys({ status: "error", message: "Please set up profile to continue." });
       navigate("/profile");
     }
-  }, [navigate, userInfo.profileSetup]);
-
+  }, [navigate, updateKeys, userInfo.profileSetup]);
+  
   return (
-    <div className="flex h-screen text-white overflow-hidden">
-      <ContactsContainer></ContactsContainer>
-      <EmptyChatContainer></EmptyChatContainer>
-      <ContactsContainer></ContactsContainer>
+    <div className=" flex h-screen text-white overflow-hidden">
+      <ContactsContainer/>
+      {
+        !selectedChatType ?  <EmptyChatContainer/> : <ChatContainer />
+      }
     </div>
   );
 };

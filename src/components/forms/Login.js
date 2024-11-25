@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../../store";
 
 const Login = memo(() => {
-  const { setUserInfo } = useAppStore();
+  const { setUserInfo,updateKeys } = useAppStore();
   const navigate = useNavigate();
   console.log("inside login form");
 
@@ -54,6 +54,8 @@ const Login = memo(() => {
 
       if (response.data.user.id) {
         setUserInfo(response.data.user);
+        updateKeys({ status: "success", message: response.data?.message });
+        
         if (response.data.user.profileSetup) navigate("/chat");
         else navigate("/profile");
       }

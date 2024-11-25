@@ -8,7 +8,7 @@ const Status = () => {
   if (message) {
     setTimeout(() => {
       updateKeys({ status: null, message: null });
-    }, 4000);
+    }, 1000);
   }
 
   return (

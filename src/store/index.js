@@ -14,8 +14,18 @@ const createStatusSlice = (set) => ({
   updateKeys: (newkeys) => set(newkeys),
 });
 
+const chatSlice = (set) => ({
+  selectedChatType: null,
+  selectedChatData: null,
+  // existing messages
+  selectedChatMessages: [],
+
+  updateFuncChat: (typeOrData) => set(typeOrData),
+});
+
 // Combined Store
 export const useAppStore = create((...args) => ({
   ...createAuthSlice(...args),
   ...createStatusSlice(...args),
+  ...chatSlice(...args),
 }));

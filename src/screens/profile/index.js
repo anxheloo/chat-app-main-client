@@ -18,7 +18,8 @@ const Profile = () => {
   const navigate = useNavigate();
 
   console.log("this is message, this is status:", status, message);
-
+  console.log("this is userInfo, :", userInfo);
+  
   const [formData, setFormData] = useState({
     firstName: userInfo?.firstName ?? "",
     lastName: userInfo?.lastName ?? "",
@@ -99,13 +100,6 @@ const Profile = () => {
         console.log("this is error:", err);
         alert("something went wrong");
       }
-
-      // const reader = new FileReader();
-      // reader.onload = () => {
-      //   setFormData((prev) => ({ ...prev, image: reader.result }));
-      // };
-
-      // reader.readAsDataURL(file);
     }
   };
 
