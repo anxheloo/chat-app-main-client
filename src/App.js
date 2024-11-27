@@ -6,10 +6,17 @@ import { useAppStore } from "./store";
 import { useEffect, useState } from "react";
 import { apiClient } from "./lib/api-client";
 import { GET_USER_INFO } from "./lib/utils";
+import { useSocket } from "./utils/useSocket";
 
 function App() {
-  const { userInfo, setUserInfo } = useAppStore();
+  console.log("Inside App");
+
+  const userInfo = useAppStore((state) => state.userInfo);
+  const setUserInfo = useAppStore((state) => state.setUserInfo);
+
   const [loading, setLoading] = useState(true);
+
+  useSocket();
 
   useEffect(() => {
     const getUserData = async () => {

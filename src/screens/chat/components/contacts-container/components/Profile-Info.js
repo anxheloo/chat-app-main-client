@@ -8,7 +8,11 @@ import { apiClient } from '../../../../../lib/api-client'
 
 const ProfileInfo = () => {
 
-    const {userInfo,setUserInfo,updateKeys} = useAppStore()
+    const userInfo = useAppStore(state => state.userInfo)
+    const setUserInfo = useAppStore(state => state.setUserInfo)
+    const updateKeys = useAppStore(state => state.updateKeys)
+    const updateFuncChat = useAppStore(state => state.updateFuncChat)
+
     const navigate = useNavigate()
 
     console.log("this is userInfo inside profile-info:", userInfo)
@@ -24,6 +28,12 @@ const ProfileInfo = () => {
               if(res.status === 200){
                 navigate("/auth")
                 setUserInfo(null)
+                setUserInfo(null);
+                updateFuncChat({
+                  selectedChatType: null,
+                  selectedChatData: null,
+                  selectedChatMessages: [],
+                });
                 updateKeys({status:"success", message:res.data.message})
               }
 
