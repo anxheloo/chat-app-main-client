@@ -21,6 +21,11 @@ const chatSlice = (set) => ({
   selectedChatData: null,
   // existing messages
   selectedChatMessages: [],
+  directMessagesContacts: [],
+  isUploading: false,
+  isDownloading: false,
+  fileUploadProgress: 0,
+  fileDownloadProgress:0,
   updateFuncChat: (typeOrData) => set(typeOrData),
 });
 

@@ -14,7 +14,13 @@ import {
 } from "../../lib/utils";
 
 const Profile = () => {
-  const { userInfo, setUserInfo, updateKeys, status, message } = useAppStore();
+
+  const userInfo = useAppStore(state => state.userInfo)
+  const setUserInfo = useAppStore(state => state.setUserInfo)
+  const updateKeys = useAppStore(state => state.updateKeys)
+  const status = useAppStore(state => state.status)
+  const message = useAppStore(state => state.message)
+
   const navigate = useNavigate();
 
   console.log("this is message, this is status:", status, message);

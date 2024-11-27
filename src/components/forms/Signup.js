@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../../store";
 
 const Signup = () => {
-  const { setUserInfo } = useAppStore();
+
+  const setUserInfo = useAppStore(state => state.setUserInfo)
+
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",

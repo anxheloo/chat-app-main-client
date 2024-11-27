@@ -11,7 +11,8 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
   const socket = useRef(null);
-  const { userInfo } = useAppStore();
+
+  const userInfo = useAppStore(state => state.userInfo)
 
   useEffect(() => {
     if (userInfo) {

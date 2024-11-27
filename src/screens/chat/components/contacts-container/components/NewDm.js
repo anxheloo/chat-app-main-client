@@ -8,7 +8,9 @@ import { useAppStore } from '../../../../../store';
 import Contact from './Contact';
 
 const NewDm = () => {
-    const {updateKeys,updateFuncChat } = useAppStore();
+
+    const updateKeys = useAppStore(state => state.updateKeys)
+    const updateFuncChat = useAppStore(state => state.updateFuncChat)
 
     const [openNewContactModel, setOpenNewContactModel] = useState(false)
     const [searchedContacts,setSearchContacts] = useState([]);

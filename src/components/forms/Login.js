@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../../store";
 
 const Login = memo(() => {
-  const { setUserInfo,updateKeys } = useAppStore();
+  const setUserInfo = useAppStore(state => state.setUserInfo)
+  const updateKeys = useAppStore(state => state.updateKeys)
   const navigate = useNavigate();
   console.log("inside login form");
 

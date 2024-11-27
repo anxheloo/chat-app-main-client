@@ -5,7 +5,9 @@ import { HOST } from "../../../../../lib/utils";
 import { getColor } from "../../../../../utils/constants";
 
 const Header = () => {
-  const { updateFuncChat, selectedChatData, selectedChatType } = useAppStore();
+  const updateFuncChat = useAppStore(state => state.updateFuncChat)
+  const selectedChatData = useAppStore(state => state.selectedChatData)
+  const selectedChatType = useAppStore(state => state.selectedChatType)
 
   return (
     <div className="h-[10vh] border-b-2 border-[#2f303d] flex items-center justify-between px-3">
