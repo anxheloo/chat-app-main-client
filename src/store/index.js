@@ -16,17 +16,47 @@ const createStatusSlice = (set) => ({
   updateKeys: (newkeys) => set(newkeys),
 });
 
-const chatSlice = (set) => ({
+const chatSlice = (set,get) => ({
   selectedChatType: null,
   selectedChatData: null,
   // existing messages
   selectedChatMessages: [],
   directMessagesContacts: [],
+  // uploading state
   isUploading: false,
   isDownloading: false,
   fileUploadProgress: 0,
   fileDownloadProgress:0,
+  // channels
+  channels: [],
   updateFuncChat: (typeOrData) => set(typeOrData),
+
+  sortChannelByLastConversation: (message) =>{
+    const channels = [...get().channels];
+    const data = channels.find( channel => channel._id === message.channelId);
+    const index = channels.findIndex( channel => channel._id === message.channelId);
+    if(index !== -1 && index !== undefined){
+      channels.splice(index,1)
+      channels.unshift(data)
+      set({channels: channels})
+    }
+  },
+
+  sortContactsByLastConversation: (message) =>{
+    const userId = get().userInfo.id;
+    const fromId = message.sender._id === userId ? message.recipient._id : message.sender._id;
+    const fromData = message.sender._id === userId ? message.recipient : message.sender;
+    const contacts = [...get().directMessagesContacts];
+    const data = contacts.find( contact => contact._id === fromId);
+    const index = contacts.findIndex( contact => contact._id === fromId);
+    if(index !== -1 && index !== undefined){
+      contacts.splice(index,1)
+      contacts.unshift(data)
+    }else{
+      contacts.unshift(fromData)
+    }
+    set({directMessagesContacts: contacts})
+  }
 });
 
 // Socket Slice

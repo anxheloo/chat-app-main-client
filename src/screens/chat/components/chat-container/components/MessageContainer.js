@@ -2,15 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAppStore } from "../../../../../store";
 import moment from "moment";
 import { apiClient } from "../../../../../lib/api-client";
-import { GET_ALL_MESSAGES, HOST } from "../../../../../lib/utils";
+import { GET_ALL_MESSAGES, GET_CHANNEL_MESSAGES, HOST } from "../../../../../lib/utils";
 import { GoFileZip } from "react-icons/go";
 import { MdDownloadForOffline } from "react-icons/md";
 import { IoMdCloseCircle } from "react-icons/io";
+import { getColor } from "../../../../../utils/constants";
 
 const MessageContainer = () => {
   console.log("Inside MessageContainer");
   const scrollRef = useRef();
 
+  const userInfo = useAppStore((state) => state.userInfo);
   const selectedChatType = useAppStore((state) => state.selectedChatType);
   const selectedChatData = useAppStore((state) => state.selectedChatData);
   const selectedChatMessages = useAppStore(
@@ -43,8 +45,27 @@ const MessageContainer = () => {
       }
     };
 
+    const getChannelMessages = async () => {
+      try {
+        const response = await apiClient.get(
+          `${GET_CHANNEL_MESSAGES}/${selectedChatData._id}`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (response.status === 200) {
+          updateFuncChat({ selectedChatMessages: response.data.messages });
+          console.log("These are messages:", response.data.messages);
+        }
+      } catch (error) {
+        updateKeys({ status: "error", message: "Something went wrong!" });
+      }
+    };
+
     if (selectedChatData._id) {
       if (selectedChatType === "contact") getAllMessages();
+      if (selectedChatType === "channel") getChannelMessages();
     }
   }, [selectedChatData, selectedChatType]);
 
@@ -64,6 +85,8 @@ const MessageContainer = () => {
 
   // main render function
   const renderMessages = () => {
+    console.log("Rendering messages:", selectedChatMessages);
+
     let lastDate = null;
 
     return selectedChatMessages.map((message, index) => {
@@ -80,25 +103,11 @@ const MessageContainer = () => {
             </div>
           )}
           {selectedChatType === "contact" && renderDmMessages(message)}
+          {selectedChatType === "channel" && renderChannelMessages(message)}
         </div>
       );
     });
   };
-
-  // const downloadFile = async(url) =>{
-
-  //   const res = await apiClient.get(`${HOST}/${url}`, {responseType: "blob"})
-
-  //   const urlBlob = window.URL.createObjectURL( new Blob([res.data]));
-  //   const link = document.createElement("a")
-  //   link.href = urlBlob
-  //   link.setAttribute("download", url.split("/").pop())
-
-  //   document.body.appendChild(link);
-  //   link.click()
-  //   link.remove();
-  //   window.URL.revokeObjectURL(urlBlob)
-  // }
 
   const downloadFile = async (url) => {
     updateFuncChat({ isDownloading: true, fileDownloadProgress: 0 });
@@ -210,6 +219,101 @@ const MessageContainer = () => {
       <div className="text-xs text-gray-600">
         {moment(message.timestamp).format("LT")}
       </div>
+    </div>
+  );
+
+  const renderChannelMessages = (message) => (
+    <div
+      className={`py-2 ${
+        message.sender._id === userInfo.id ? "text-right" : "text-left"
+      }`}
+    >
+      {message.messageType === "text" && (
+        <div
+          className={`${
+            message.sender._id === userInfo.id
+              ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]/50"
+              : "bg-[#2a2b33]/5 text-white/80 border-white/20"
+          } border inline-block p-4 rounded max-w-[50%] break-words`}
+        >
+          {message.content}
+        </div>
+      )}
+
+      {message.messageType === "file" && (
+        <div
+          className={`${
+            message.sender._id !== userInfo.id
+              ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]/50"
+              : "bg-[#2a2b33]/5 text-white/80 border-white/20"
+          } border inline-block p-4 rounded max-w-[50%] break-words`}
+        >
+          {checkIfImage(message.fileUrl) ? (
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                setShowImage(true);
+                setImageUrl(message.fileUrl);
+              }}
+            >
+              <img
+                src={`${HOST}/${message.fileUrl}`}
+                alt="file display"
+                className=" size-[300px]"
+              />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-4">
+              <span className="tet-white/80 text-3xl bg-black/20 rounded-full p-3">
+                <GoFileZip />
+              </span>
+              <span>{message.fileUrl.split("/").pop()}</span>
+              <span
+                className="text-3xl cursor-pointer hover:opacity-80"
+                onClick={() => downloadFile(message.fileUrl)}
+              >
+                <MdDownloadForOffline />
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {message.sender._id !== userInfo.id ? (
+        <div className="flex gap-2 items-center py-1">
+          <div className="size-6 rounded-full overflow-hidden">
+            {message.sender.image ? (
+              <img
+                src={`${HOST}/${message.sender.image}`}
+                alt="avatar"
+                className="w-full h-full object-cover bg-black"
+              />
+            ) : (
+              <div
+                className={` uppercase w-full h-full text-lg border-[1px] flex items-center justify-center rounded-full ${getColor(
+                  message.sender.color
+                )}`}
+              >
+                {message.sender.firstName
+                  ? message.sender.firstName?.split("").shift()
+                  : message.sender.email?.split("").shift()}
+              </div>
+            )}
+          </div>
+
+          {message.sender.firstName && message.sender.lastName
+            ? `${message.sender.firstName} ${message.sender.lastName}`
+            : ""}
+
+          <div className="text-xs text-gray-600">
+            {moment(message.timestamp).format("LT")}
+          </div>
+        </div>
+      ) : (
+        <div className="text-xs text-gray-600">
+          {moment(message.timestamp).format("LT")}
+        </div>
+      )}
     </div>
   );
 

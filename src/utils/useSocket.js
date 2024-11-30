@@ -7,26 +7,23 @@ export const useSocket = () => {
   const userInfo = useAppStore((state) => state.userInfo);
   const initializeSocket = useAppStore((state) => state.initializeSocket);
   const disconnectSocket = useAppStore((state) => state.disconnectSocket);
-  
-  useEffect(() => {
 
+  useEffect(() => {
     console.log("Inside useEffect of useSocket hook");
 
     if (userInfo) {
-
-     const socketInstance = initializeSocket();
+      const socketInstance = initializeSocket();
 
       if (socketInstance) {
-
         const handleReceiveMessage = (message) => {
-
           const {
             selectedChatType,
             selectedChatData,
             updateFuncChat,
             selectedChatMessages,
+            sortContactsByLastConversation
           } = useAppStore.getState();
-  
+
           if (
             selectedChatType !== undefined &&
             (selectedChatData?._id === message.sender._id ||
@@ -42,7 +39,7 @@ export const useSocket = () => {
                     selectedChatType === "channel"
                       ? message.recipient
                       : message.recipient._id,
-  
+
                   sender:
                     selectedChatType === "channel"
                       ? message.sender
@@ -51,14 +48,39 @@ export const useSocket = () => {
               ],
             });
           }
-        };
-  
-        socketInstance.on("receiveMessage", handleReceiveMessage);
 
+          sortContactsByLastConversation(message)
+        };
+
+        const handleReceiveChannelMessage = (message) => {
+          console.log("Received channel message:", message);
+
+          const {
+            selectedChatType,
+            selectedChatData,
+            updateFuncChat,
+            selectedChatMessages,
+            sortChannelByLastConversation
+          } = useAppStore.getState();
+
+          if (
+            selectedChatType !== undefined &&
+            selectedChatData?._id === message.channelId
+          ) {
+            console.log(" channel message recived:", message);
+            updateFuncChat({
+              selectedChatMessages: [...selectedChatMessages, message],
+            });
+          }
+          
+          sortChannelByLastConversation(message)
+        };
+
+        socketInstance.on("receiveMessage", handleReceiveMessage);
+        socketInstance.on("receiveChannelMessage", handleReceiveChannelMessage);
       }
     }
-  
+
     return () => disconnectSocket();
   }, [userInfo]);
-  
 };

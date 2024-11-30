@@ -14,7 +14,7 @@ const Header = () => {
       <div className="flex gap-5 items-center">
         <div className="flex gap-3 items-center justify-center">
           <div className="size-12 rounded-full overflow-hidden">
-            <>
+            { selectedChatType === "contact" ? <>
               {selectedChatData.image ? (
                 <img
                   src={`${HOST}/${selectedChatData.image}`}
@@ -32,9 +32,10 @@ const Header = () => {
                     : selectedChatData?.email?.split("").shift()}
                 </div>
               )}
-            </>
+            </> : <div className="bg-[#ffffff22] w-full h-full text-lg border-[1px] rounded-full flex items-center justify-center text-white">#</div>}
           </div>
           {selectedChatType === "contact" && selectedChatData.firstName ? `${selectedChatData.firstName} ${selectedChatData.lastName}` : selectedChatData.email}
+          {selectedChatType === "channel" && selectedChatData.name}
         </div>
       </div>
         <div className="flex items-center gap-5 justify-center">
